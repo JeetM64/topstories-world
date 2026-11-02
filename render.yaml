@@ -2,8 +2,8 @@ services:
   - type: web
     name: topstories-world-api
     runtime: node
-    region: oregon
-    plan: starter
+    region: ohio
+    plan: free
     buildCommand: npm ci
     startCommand: npm start
     healthCheckPath: /api/health
@@ -19,7 +19,7 @@ services:
       - key: COOKIE_SAME_SITE
         value: none
       - key: CORS_ORIGIN
-        sync: false
+        value: https://topstories-world.vercel.app
       - key: ADMIN_EMAIL
         sync: false
       - key: ADMIN_PASSWORD
@@ -33,7 +33,7 @@ databases:
   - name: topstories-world-db
     databaseName: topstories
     user: topstories
-    region: oregon
-    plan: basic-256mb
+    region: ohio
+    plan: free
     postgresMajorVersion: "16"
     ipAllowList: []
