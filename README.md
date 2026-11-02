@@ -45,7 +45,7 @@ The app is served on `http://localhost:3000`. For a public HTTPS deployment, set
 
 Deployment manifests are included for Vercel (`vercel.json`) and Render (`render.yaml`). Vercel serves the Vite SPA and rewrites direct article/category URLs to the client app. Render runs Express with managed PostgreSQL; startup applies additive migrations and upserts the source-linked November 2026 editorial feed.
 
-For Vercel, import the repository and set `VITE_API_BASE_URL` to the public Render API origin (for example, `https://topstories-world-api.onrender.com`). For Render, provide the exact Vercel production origin as `CLIENT_ORIGIN`, and set `ADMIN_EMAIL` / `ADMIN_PASSWORD`. The blueprint enables HTTPS-only `SameSite=None` cookies for cross-origin frontend/API sessions and generates the JWT secret. Keep API and frontend origins aligned. Cookie authentication uses credentialed CORS.
+For Vercel, import the repository and set `VITE_API_URL` (or `VITE_API_BASE_URL`) to the public Render API origin (for example, `https://topstories-world-api.onrender.com`). For Render, provide the exact Vercel production origin as `CORS_ORIGIN`, and set `ADMIN_EMAIL` / `ADMIN_PASSWORD`. The blueprint enables HTTPS-only `SameSite=None` cookies for cross-origin frontend/API sessions and generates the JWT secret. Keep API and frontend origins aligned. Cookie authentication uses credentialed CORS.
 
 The source directory must be pushed to a Git provider before either host can import it. Do not place `.env` or production secrets in Git. Review the Render service and database plan and current pricing before creating cloud resources.
 
@@ -75,7 +75,7 @@ The source directory must be pushed to a Git provider before either host can imp
 - `/auth/login` and `/auth/signup` — dedicated reader account screens
 - `/admin` — role-protected publishing dashboard
 
-The API reflects credentialed CORS only for the configured `CLIENT_ORIGIN` / `APP_CLIENT_ORIGIN` and the local development origins `http://localhost:5173` and `http://localhost:3000`. Add the exact production frontend origin to the environment before deployment. PostgreSQL startup migrations create users, articles, comments, likes, bookmarks, reading history, and newsletter subscribers with foreign keys where applicable. Source-linked seed stories are upserted idempotently by source URL at startup, and generic placeholder rows are removed.
+The API reflects credentialed CORS only for the configured `CORS_ORIGIN`, `CLIENT_ORIGIN`, or `APP_CLIENT_ORIGIN` and the local development origins `http://localhost:5173` and `http://localhost:3000`. Add the exact production frontend origin to the environment before deployment. PostgreSQL startup migrations create users, articles, comments, likes, bookmarks, reading history, and newsletter subscribers with foreign keys where applicable. Source-linked seed stories are upserted idempotently by source URL at startup, and generic placeholder rows are removed.
 
 ## Build and checks
 

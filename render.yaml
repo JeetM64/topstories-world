@@ -18,7 +18,7 @@ services:
         value: "true"
       - key: COOKIE_SAME_SITE
         value: none
-      - key: CLIENT_ORIGIN
+      - key: CORS_ORIGIN
         sync: false
       - key: ADMIN_EMAIL
         sync: false

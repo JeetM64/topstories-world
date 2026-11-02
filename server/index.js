@@ -12,7 +12,7 @@ import { z } from 'zod'
 import { initializeDatabase, pool } from './db.js'
 
 const app=express(),port=Number(process.env.PORT||3000)
-const allowedOrigins=new Set(['http://localhost:5173','http://localhost:3000','http://127.0.0.1:3000',process.env.CLIENT_ORIGIN,process.env.APP_CLIENT_ORIGIN].filter(Boolean))
+const allowedOrigins=new Set(['http://localhost:5173','http://localhost:3000','http://127.0.0.1:3000',process.env.CORS_ORIGIN,process.env.CLIENT_ORIGIN,process.env.APP_CLIENT_ORIGIN].filter(Boolean))
 const here=path.dirname(fileURLToPath(import.meta.url)),root=path.resolve(here,'..')
 if(!process.env.JWT_SECRET||process.env.JWT_SECRET.length<32) throw new Error('JWT_SECRET must contain at least 32 characters. Copy .env.example and replace the placeholder with a random secret.')
 app.disable('x-powered-by')
