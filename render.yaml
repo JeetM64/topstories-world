@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: topstories-world-api
+    runtime: node
+    region: oregon
+    plan: starter
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 15m
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: COOKIE_SAME_SITE
+        value: none
+      - key: CLIENT_ORIGIN
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: topstories-world-db
+          property: connectionString
+
+databases:
+  - name: topstories-world-db
+    databaseName: topstories
+    user: topstories
+    region: oregon
+    plan: basic-256mb
+    postgresMajorVersion: "16"
+    ipAllowList: []
