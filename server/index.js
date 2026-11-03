@@ -76,7 +76,10 @@ const distDirectory=path.join(root,'dist'),distIndex=path.join(distDirectory,'in
 if(process.env.NODE_ENV==='production')app.use(express.static(distDirectory,{index:false,maxAge:'1h'}))
 app.use((req,res,next)=>{
   if(req.path==='/api'||req.path.startsWith('/api/'))return res.status(404).json({error:'API endpoint not found'})
-  if(process.env.NODE_ENV==='production'&&existsSync(distIndex)&&(req.method==='GET'||req.method==='HEAD'))return res.sendFile(distIndex)
+  if(process.env.NODE_ENV==='production'){
+    if(existsSync(distIndex)&&(req.method==='GET'||req.method==='HEAD'))return res.sendFile(distIndex)
+    if(!existsSync(distIndex))return res.status(404).json({error:'API endpoint not found'})
+  }
   next()
 })
 app.use((err,_req,res,_next)=>{if(err instanceof z.ZodError)return res.status(400).json({error:'Please check the submitted fields.',details:err.issues.map(x=>({field:x.path.join('.'),message:x.message}))});if(err.code==='23505')return res.status(409).json({error:'An account with that email already exists.'});if(err.code==='23503'||err.code==='22P02')return res.status(404).json({error:'The requested record was not found.'});console.error('API error:',err.message);res.status(500).json({error:'Something went wrong. Please try again.'})})
