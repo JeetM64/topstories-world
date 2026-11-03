@@ -21,3 +21,16 @@
 
 .article-aside button{border:0;padding:0;text-align:left;background:transparent;font:11px var(--serif);color:#777}.article-aside button:hover{color:var(--orange)}.more-link{width:100%;border:0;padding:0;text-align:left;background:transparent;cursor:pointer}.more-link:disabled{cursor:default}.footer-links{justify-content:center}.footer-links a{white-space:nowrap}.side-head{padding:0;color:var(--ink);text-align:left;font:9px var(--mono);letter-spacing:.1em}.side-head:hover{color:var(--orange)}.profile-page .account-tabs{flex-wrap:wrap}.author-bio{max-width:350px}
 @media(max-width:650px){footer{display:grid;grid-template-columns:1fr;gap:15px}.footer-links{justify-content:flex-start}.more-link{font-size:8px}.drawer-scrim{z-index:80}}
+
+/* Loading, focus, and motion polish */
+.story-skeleton{min-width:0;animation:skeleton-in .25s ease both}
+.skeleton-image,.skeleton-line{background:linear-gradient(100deg,#e9e6de 20%,#f3f1eb 38%,#e9e6de 56%);background-size:220% 100%;animation:skeleton-shimmer 1.35s ease-in-out infinite}
+.skeleton-image{aspect-ratio:16/10;margin-bottom:17px}
+.skeleton-line{height:10px;margin:0 0 11px}.skeleton-line.short{width:28%;height:7px}.skeleton-line.title{width:94%;height:16px}.skeleton-line.second{width:70%}.skeleton-line.excerpt{width:82%;height:8px;margin-top:17px}
+@keyframes skeleton-shimmer{to{background-position-x:-220%}}@keyframes skeleton-in{from{opacity:.45;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.story-card,.pick,.navlinks button,.category-filter button,.drawer-categories button{transition:color .2s ease,background-color .2s ease,border-color .2s ease,transform .25s ease}
+.story-card:hover .image-button img{transform:scale(1.035)}
+.story-card .image-button img,.hero-image img{background:linear-gradient(135deg,#1d2930,#795344 55%,#d18a58)}
+.eyebrow{color:#66645d}.story-card .eyebrow,.pick-text small{font-weight:600;letter-spacing:.12em}.category-filter button:focus-visible,.nav button:focus-visible,.drawer-link:focus-visible,.drawer-categories button:focus-visible,.story-card button:focus-visible,.footer-links a:focus-visible{outline:2px solid var(--orange);outline-offset:4px}
+html,body,#root{max-width:100%;overflow-x:clip}.story-grid>*{min-width:0}.site-drawer{overscroll-behavior:contain}.drawer-scrim{touch-action:pan-y}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}

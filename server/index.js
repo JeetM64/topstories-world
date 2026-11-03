@@ -1,5 +1,6 @@
 import 'dotenv/config'
 import path from 'node:path'
+import { existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import express from 'express'
 import cors from 'cors'
@@ -12,12 +13,14 @@ import { z } from 'zod'
 import { initializeDatabase, pool } from './db.js'
 
 const app=express(),port=Number(process.env.PORT||3000)
-const allowedOrigins=new Set(['http://localhost:5173','http://localhost:3000','http://127.0.0.1:3000',process.env.CORS_ORIGIN,process.env.CLIENT_ORIGIN,process.env.APP_CLIENT_ORIGIN].filter(Boolean))
+const allowedOrigins=new Set(['http://localhost:5173','http://localhost:3000','http://127.0.0.1:3000','https://topstories-world.vercel.app',process.env.CORS_ORIGIN,process.env.CLIENT_ORIGIN,process.env.APP_CLIENT_ORIGIN].filter(Boolean))
 const here=path.dirname(fileURLToPath(import.meta.url)),root=path.resolve(here,'..')
 if(!process.env.JWT_SECRET||process.env.JWT_SECRET.length<32) throw new Error('JWT_SECRET must contain at least 32 characters. Copy .env.example and replace the placeholder with a random secret.')
 app.disable('x-powered-by')
 app.use(helmet({contentSecurityPolicy:{directives:{defaultSrc:["'self'"],imgSrc:["'self'",'https:','data:'],styleSrc:["'self'","'unsafe-inline'",'https://fonts.googleapis.com'],fontSrc:["'self'",'data:','https://fonts.gstatic.com'],connectSrc:["'self'",...allowedOrigins],scriptSrc:["'self'"]}}}))
-app.use(cors({origin:(requestOrigin,callback)=>callback(null,requestOrigin&&allowedOrigins.has(requestOrigin)?requestOrigin:false),credentials:true,methods:['GET','POST','PATCH','DELETE','OPTIONS'],allowedHeaders:['Content-Type','Authorization'],maxAge:600}))
+const corsOptions={origin:(requestOrigin,callback)=>callback(null,requestOrigin&&allowedOrigins.has(requestOrigin)?requestOrigin:false),credentials:true,methods:['GET','POST','PATCH','DELETE','OPTIONS'],allowedHeaders:['Content-Type','Authorization'],maxAge:600}
+app.use(cors(corsOptions))
+app.options(/.*/,cors(corsOptions))
 app.use(express.json({limit:'100kb'}));app.use(cookieParser())
 app.use('/api',(req,res,next)=>{const source=req.get('origin');if(['POST','PATCH','DELETE'].includes(req.method)&&source&&!allowedOrigins.has(source))return res.status(403).json({error:'Request origin is not allowed.'});next()})
 app.use('/api',rateLimit({windowMs:15*60*1000,limit:300,standardHeaders:'draft-8',legacyHeaders:false}))
@@ -69,9 +72,13 @@ app.post('/api/admin/articles',authenticate,allowRoles('editor','admin'),asyncRo
 app.patch('/api/admin/articles/:id',authenticate,allowRoles('editor','admin'),asyncRoute(async(req,res)=>{const a=articleSchema.partial().parse(req.body);const cols={category:'category',title:'title',excerpt:'excerpt',author:'author',role:'role',authorBio:'author_bio',image:'image',body:'body',time:'read_time',featured:'featured',published:'published',sourceName:'source_name',sourceUrl:'source_url',sourceDate:'source_published_at'};const entries=Object.entries(a);if(!entries.length)return res.status(400).json({error:'No article fields supplied.'});const values=[req.params.id,...entries.map(([key,value])=>key==='sourceUrl'&&!value?'':value)],sets=entries.map(([k],i)=>`${cols[k]}=$${i+2}`);const {rows}=await pool.query(`UPDATE articles SET ${sets.join(',')},updated_at=now() WHERE id=$1 RETURNING *`,values);if(!rows[0])return res.status(404).json({error:'Story not found.'});res.json({article:articleOut(rows[0])})}))
 app.delete('/api/admin/articles/:id',authenticate,allowRoles('editor','admin'),asyncRoute(async(req,res)=>{const {rowCount}=await pool.query('DELETE FROM articles WHERE id=$1',[req.params.id]);if(!rowCount)return res.status(404).json({error:'Story not found.'});res.json({ok:true})}))
 
-if(process.env.NODE_ENV==='production')app.use(express.static(path.join(root,'dist'),{index:false,maxAge:'1h'}))
-app.use('/api',(req,res)=>res.status(404).json({error:'API route not found.'}))
-if(process.env.NODE_ENV==='production')app.get(/.*/,(_req,res)=>res.sendFile(path.join(root,'dist','index.html')))
+const distDirectory=path.join(root,'dist'),distIndex=path.join(distDirectory,'index.html')
+if(process.env.NODE_ENV==='production')app.use(express.static(distDirectory,{index:false,maxAge:'1h'}))
+app.use((req,res,next)=>{
+  if(req.path==='/api'||req.path.startsWith('/api/'))return res.status(404).json({error:'API endpoint not found'})
+  if(process.env.NODE_ENV==='production'&&existsSync(distIndex)&&(req.method==='GET'||req.method==='HEAD'))return res.sendFile(distIndex)
+  next()
+})
 app.use((err,_req,res,_next)=>{if(err instanceof z.ZodError)return res.status(400).json({error:'Please check the submitted fields.',details:err.issues.map(x=>({field:x.path.join('.'),message:x.message}))});if(err.code==='23505')return res.status(409).json({error:'An account with that email already exists.'});if(err.code==='23503'||err.code==='22P02')return res.status(404).json({error:'The requested record was not found.'});console.error('API error:',err.message);res.status(500).json({error:'Something went wrong. Please try again.'})})
 
 await initializeDatabase()
