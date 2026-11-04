@@ -34,3 +34,6 @@
 .eyebrow{color:#66645d}.story-card .eyebrow,.pick-text small{font-weight:600;letter-spacing:.12em}.category-filter button:focus-visible,.nav button:focus-visible,.drawer-link:focus-visible,.drawer-categories button:focus-visible,.story-card button:focus-visible,.footer-links a:focus-visible{outline:2px solid var(--orange);outline-offset:4px}
 html,body,#root{max-width:100%;overflow-x:clip}.story-grid>*{min-width:0}.site-drawer{overscroll-behavior:contain}.drawer-scrim{touch-action:pan-y}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* Demo-ready drawer: clear dismissal affordance, safe-area spacing, and reduced motion. */
+.drawer-scrim{background:rgba(18,18,16,.48);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);cursor:pointer}.site-drawer{cursor:default;max-height:100dvh;padding-bottom:max(24px,env(safe-area-inset-bottom))}.mobile-menu{border-radius:3px;transition:background-color .18s,border-color .18s}.mobile-menu:hover{background:#eeece6;border-color:var(--rule)}@media(prefers-reduced-motion:reduce){.drawer-scrim,.site-drawer{animation:none}}
