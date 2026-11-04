@@ -37,3 +37,5 @@ html,body,#root{max-width:100%;overflow-x:clip}.story-grid>*{min-width:0}.site-d
 
 /* Demo-ready drawer: clear dismissal affordance, safe-area spacing, and reduced motion. */
 .drawer-scrim{background:rgba(18,18,16,.48);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);cursor:pointer}.site-drawer{cursor:default;max-height:100dvh;padding-bottom:max(24px,env(safe-area-inset-bottom))}.mobile-menu{border-radius:3px;transition:background-color .18s,border-color .18s}.mobile-menu:hover{background:#eeece6;border-color:var(--rule)}@media(prefers-reduced-motion:reduce){.drawer-scrim,.site-drawer{animation:none}}
+
+.mobile-menu{touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none}
